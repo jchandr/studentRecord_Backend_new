@@ -31,20 +31,35 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-    const student = {
-        firstName: req.query.firstName,
-        lastName: req.query.lastName,
-        email: req.query.email,
-        studentBNumber: req.query.studentBNumber,
-        username: req.query.username,
-        contactAdvisor: req.query.contactAdvisor,
-        authorizeFlag: req.query.authorizeFlag,
-        studentType: req.query.studentType,
-        addBy: req.query.addBy,
-    };
-    res.status(201).json({
-        message: 'Student was created',
-        student: student
+    const student = [
+        req.query.firstName,
+        req.query.lastName,
+        req.query.email,
+        req.query.studentBNumber,
+        req.query.username,
+        req.query.contactAdvisor,
+        req.query.authorizeFlag,
+        req.query.studentType,
+        req.query.addBy,
+    ];
+    connection.query('insert into studenttable (First_Name,' +
+        'Last_Name,' +
+        'Email,' +
+        'Stud_BNumber,' +
+        'Username,' +
+        'Contact_Advisor,' +
+        'AuthorizeFlag,' +
+        'Student_Type,' +
+        'AddBy) values (?,?,?,?,?,?,?,?,?)',student, (err, response, fields) => {
+        if(err) {
+            res.status(400).json({
+                message: err,
+            });
+        }
+        res.status(201).json({
+            message: 'Student' + 'was created',
+            student: response
+        });
     });
 });
 
