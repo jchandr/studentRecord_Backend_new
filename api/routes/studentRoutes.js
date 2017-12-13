@@ -3,7 +3,31 @@ const router = express.Router();
 const connection = require('../../dataBaseConnection');
 
 router.get('/', (req, res, next) => {
-    connection.query('select * from studenttable', (err, response, fields) => {
+    connection.query('select idx,firstName,lastName from studenttable', (err, response, fields) => {
+        if(err) {
+            console.log(err)
+        } else {
+            res.status(200).send({
+                response
+            })
+        }
+    })
+});
+
+router.get('/ms', (req, res, next) => {
+    connection.query('select idx,firstName,lastName from studenttable where studentType = ?','MS', (err, response, fields) => {
+        if(err) {
+            console.log(err)
+        } else {
+            res.status(200).send({
+                response
+            })
+        }
+    })
+});
+
+router.get('/phd', (req, res, next) => {
+    connection.query('select idx,firstName,lastName from studenttable where studentType = ?','PHD', (err, response, fields) => {
         if(err) {
             console.log(err)
         } else {
@@ -15,17 +39,6 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-    const student = [
-        req.query.firstName,
-        req.query.lastName,
-        req.query.email,
-        req.query.studentBNumber,
-        req.query.username,
-        req.query.contactAdvisor,
-        req.query.authorizeFlag,
-        req.query.studentType,
-        req.query.addBy,
-    ];
     connection.query('insert into studenttable (First_Name,' +
         'Last_Name,' +
         'Email,' +
@@ -62,6 +75,22 @@ router.get('/:studentId', (req, res, next) => {
                 });
             }
         });
+});
+
+router.get('/:studentId/funding', (req, res, next) => {
+    connection.query('select * from fundingtable where Idx=?', req.params.studentId,
+      (err, response, fields) => {
+        if(err) {
+            res.status(400).json({
+              message: err,
+            });
+        } else {
+            res.status(200).json({
+              message: 'Student Funding Details',
+              response: response
+            });
+        }
+      })
 });
 
 module.exports = router;
