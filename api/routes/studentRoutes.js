@@ -1,25 +1,33 @@
 const express = require('express');
 const router = express.Router();
-
-const mysql = require('mysql');
-
-const connection = mysql.createConnection({
-    host: 'bustudentrecord.cs1znygw5ppc.us-west-2.rds.amazonaws.com',
-    user: 'root',
-    password: 'wlan80211',
-    database: 'bu_student_record'
-});
-
-connection.connect((err) => {
-    if(err) {
-        console.error('error connecting database: ' + err.stack);
-        return;
-    }
-    console.log('connected to database as id ' + connection.threadId);
-});
+const connection = require('../../dataBaseConnection');
 
 router.get('/', (req, res, next) => {
-    connection.query('select * from studenttable', (err, response, fields) => {
+    connection.query('select idx,firstName,lastName from studenttable', (err, response, fields) => {
+        if(err) {
+            console.log(err)
+        } else {
+            res.status(200).send({
+                response
+            })
+        }
+    })
+});
+
+router.get('/ms', (req, res, next) => {
+    connection.query('select idx,firstName,lastName from studenttable where studentType = ?','MS', (err, response, fields) => {
+        if(err) {
+            console.log(err)
+        } else {
+            res.status(200).send({
+                response
+            })
+        }
+    })
+});
+
+router.get('/phd', (req, res, next) => {
+    connection.query('select idx,firstName,lastName from studenttable where studentType = ?','PHD', (err, response, fields) => {
         if(err) {
             console.log(err)
         } else {
@@ -31,21 +39,58 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-    const student = {
-        firstName: req.query.firstName,
-        lastName: req.query.lastName,
-        email: req.query.email,
-        studentBNumber: req.query.studentBNumber,
-        username: req.query.username,
-        contactAdvisor: req.query.contactAdvisor,
-        authorizeFlag: req.query.authorizeFlag,
-        studentType: req.query.studentType,
-        addBy: req.query.addBy,
-    };
-    res.status(201).json({
-        message: 'Student was created',
-        student: student
+    connection.query('insert into studenttable (First_Name,' +
+        'Last_Name,' +
+        'Email,' +
+        'Stud_BNumber,' +
+        'Username,' +
+        'Contact_Advisor,' +
+        'AuthorizeFlag,' +
+        'Student_Type,' +
+        'AddBy) values (?,?,?,?,?,?,?,?,?)',student, (err, response, fields) => {
+        if(err) {
+            res.status(400).json({
+                message: err,
+            });
+        } else {
+            res.status(201).json({
+                message: 'Student' + 'was created',
+                response: response
+            });
+        }
     });
+});
+
+router.get('/:studentId', (req, res, next) => {
+    connection.query('select * from studenttable where Idx=?', req.params.studentId,
+        (err, response, fields) => {
+            if(err) {
+                res.status(400).json({
+                    message: err,
+                });
+            } else {
+                res.status(200).json({
+                    message: 'Student details',
+                    response: response
+                });
+            }
+        });
+});
+
+router.get('/:studentId/funding', (req, res, next) => {
+    connection.query('select * from fundingtable where Idx=?', req.params.studentId,
+      (err, response, fields) => {
+        if(err) {
+            res.status(400).json({
+              message: err,
+            });
+        } else {
+            res.status(200).json({
+              message: 'Student Funding Details',
+              response: response
+            });
+        }
+      })
 });
 
 module.exports = router;
