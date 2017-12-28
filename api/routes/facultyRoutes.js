@@ -8,7 +8,7 @@ router.get('/', (req, res, next) => {
         if(err) {
             console.log(err)
         } else {
-            res.status(200).send({
+            res.status(201).send({
                 response
             })
         }
