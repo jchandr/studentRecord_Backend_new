@@ -1,5 +1,5 @@
 'use strict';
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   var Student = sequelize.define('Student', {
     idx: {
       type: DataTypes.INTEGER(6),
@@ -43,7 +43,7 @@ module.exports = function(sequelize, DataTypes) {
     studentType: {
       type: DataTypes.STRING(15),
       allowNull: false,
-      defaultValue: 'PhD'
+      defaultValue: 'PHD',
     },
     addBy: {
       type: DataTypes.STRING(10),
@@ -53,8 +53,7 @@ module.exports = function(sequelize, DataTypes) {
     timestamps: false,
     freezeTableName: true,
     tableName: 'studenttable'
-  }, {
-  });
+  }, {});
   return Student;
 };
 
