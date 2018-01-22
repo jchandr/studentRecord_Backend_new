@@ -112,13 +112,13 @@ router.post('/:studentId/funding', (req, res, next) => {
   const sqlQuery = 'insert into fundingtable (idx, numberCredits, raOrTaOrGa, semesterCode,' +
     'stipend, stipendAmount, editBy) values (?)'
   connection.query(sqlQuery, [[
-    newFunding.idx,
-    newFunding.numberCredits,
-    newFunding.raOrTaOrGa,
-    newFunding.semesterCode,
-    newFunding.stipend,
-    newFunding.stipendAmount,
-    newFunding.editBy
+      newFunding.idx,
+      newFunding.numberCredits,
+      newFunding.raOrTaOrGa,
+      newFunding.semesterCode,
+      newFunding.stipend,
+      newFunding.stipendAmount,
+      newFunding.editBy
     ]],
     (err, response, fields) => {
       if (err) {
@@ -128,6 +128,25 @@ router.post('/:studentId/funding', (req, res, next) => {
       } else {
         res.status(201).json({
           message: 'Student Funding created',
+          response: response
+        })
+      }
+    })
+})
+
+router.delete('/:studentId/funding/:rowIdx', (req, res, next) => {
+  const rowIdxToDelete = req.params.rowIdx
+  const sqlQuery = 'delete from fundingtable where rowIdx = ?'
+  connection.query(sqlQuery,
+    [[rowIdxToDelete]],
+    (err, response, fields) => {
+      if (err) {
+        res.status(400).json({
+          message: err
+        })
+      } else {
+        res.status(201).json({
+          message: 'student funding deleted',
           response: response
         })
       }
