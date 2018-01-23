@@ -1,7 +1,6 @@
-/* jshint indent: 2 */
-
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('facultytable', {
+'use strict'
+module.exports = (sequelize, DataTypes) => {
+  var Faculty = sequelize.define('Faculty', {
     facultyId: {
       type: DataTypes.INTEGER(3),
       allowNull: false,
@@ -32,6 +31,9 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
+    timestamps: false,
+    freezeTableName: true,
     tableName: 'facultytable'
-  });
+  },{});
+  return Faculty;
 };

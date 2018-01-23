@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 const studentRoutes = require('./api/routes/studentRoutes')
+const facultyRoutes = require('./api/routes/facultyRoutes')
 
 var app = express();
 
@@ -35,6 +36,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/students', studentRoutes)
+app.use('/faculties', facultyRoutes)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

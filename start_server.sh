@@ -8,7 +8,7 @@ if [ $# -le 0 ]; then
         echo "Incorrect usage."
         echo "USAGE:  ./start_server {PORT_NUMBER}"
         exit 1
-    fi
+fi
 
 PORT=$1 npm start
 

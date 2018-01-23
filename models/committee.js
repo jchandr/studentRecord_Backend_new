@@ -1,7 +1,6 @@
-/* jshint indent: 2 */
-
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('committeetable', {
+'use strict'
+module.exports = (sequelize, DataTypes) => {
+  var Committee = sequelize.define('Committee', {
     rowIdx: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -34,6 +33,9 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
+    timestamps: false,
+    freezeTableName: true,
     tableName: 'committeetable'
-  });
-};
+  },{});
+  return Committee
+}
