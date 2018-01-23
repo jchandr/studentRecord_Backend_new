@@ -1,18 +1,12 @@
-const express = require('express');
-const router = express.Router();
+var express = require('express')
+var models = require('../../models')
+var router = express.Router()
 
-const connection = require('../../dataBaseConnection');
+router.get('/', (req, res) => {
+  models.Faculty.findAll({}).then(faculties => {
+    res.status(200)
+    res.json(faculties)
+  })
+})
 
-router.get('/', (req, res, next) => {
-    connection.query('select * from facultytable', (err, response, fields) => {
-        if(err) {
-            console.log(err)
-        } else {
-            res.status(201).send({
-                response
-            })
-        }
-    })
-});
-
-module.exports = router;
+module.exports = router

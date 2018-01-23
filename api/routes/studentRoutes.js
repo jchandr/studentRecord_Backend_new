@@ -1,156 +1,110 @@
-const express = require('express')
-const router = express.Router()
-const connection = require('../../dataBaseConnection')
+var express = require('express')
+var models = require('../../models')
+var router = express.Router()
+var Sequelize = require('sequelize')
+var pick = require('lodash/pick')
+const Op = Sequelize.Op
 
-router.get('/', (req, res, next) => {
-  const sqlQuery = 'select idx,firstName,lastName from studenttable'
-  connection.query(sqlQuery, (err, response, fields) => {
-    if (err) {
-      console.log(err)
-    } else {
-      res.status(201).send({
-        response
-      })
-    }
+router.get('/', (req, res) => {
+  models.Student.findAll({}).then(students => {
+    res.status(200)
+    res.json(students)
   })
 })
 
-router.get('/ms', (req, res, next) => {
-  const sqlQuery = 'select idx,firstName,lastName from studenttable where studentType = ?'
-  connection.query(sqlQuery, 'MS', (err, response, fields) => {
-    if (err) {
-      console.log(err)
-    } else {
-      res.status(201).send({
-        response
-      })
+router.get('/ms', (req, res) => {
+  models.Student.findAll({
+    where: {
+      studentType: {[Op.eq]: 'MS'}
     }
+  }).then(students => {
+    res.status(200)
+    res.json(students)
   })
 })
 
-router.get('/phd', (req, res, next) => {
-  const sqlQuery = 'select idx,firstName,lastName from studenttable where studentType = ?'
-  connection.query(sqlQuery, 'PHD', (err, response, fields) => {
-    if (err) {
-      console.log(err)
-    } else {
-      res.status(201).send({
-        response
-      })
+router.get('/phd', (req, res) => {
+  models.Student.findAll({
+    where: {
+      studentType: {[Op.eq]: 'PHD'}
     }
+  }).then(students => {
+    res.status(200)
+    res.json(students)
   })
 })
 
-router.post('/', (req, res, next) => {
-  const sqlQuery = 'insert into studenttable (First_Name,' +
-    'Last_Name,' +
-    'Email,' +
-    'Stud_BNumber,' +
-    'Username,' +
-    'Contact_Advisor,' +
-    'AuthorizeFlag,' +
-    'Student_Type,' +
-    'AddBy) values (?,?,?,?,?,?,?,?,?)'
-  connection.query(sqlQuery, student, (err, response, fields) => {
-    if (err) {
-      res.status(400).json({
-        message: err,
-      })
-    } else {
-      res.status(201).json({
-        message: 'Student' + 'was created',
-        response: response
-      })
+router.get('/:studentId', (req, res) => {
+  models.Student.find({
+    where: {
+      idx: {[Op.eq]: req.params.studentId}
     }
+  }).then(student => {
+    res.status(200)
+    res.json(student)
   })
 })
 
-router.get('/:studentId', (req, res, next) => {
-  const sqlQuery = 'select * from studenttable where Idx=?'
-  connection.query(sqlQuery, req.params.studentId,
-    (err, response, fields) => {
-      if (err) {
-        res.status(400).json({
-          message: err,
-        })
-      } else {
-        res.status(201).json({
-          message: 'Student details',
-          response: response
-        })
-      }
-    })
+router.get('/:studentId/funding', (req, res) => {
+  models.Funding.findAll({
+    where: {
+      idx: {[Op.eq]: req.params.studentId}
+    }
+  }).then(studentFudings => {
+    res.status(200)
+    res.json(studentFudings)
+  })
 })
 
-router.get('/:studentId/funding', (req, res, next) => {
-  const sqlQuery = 'select * from fundingtable where Idx=?'
-  connection.query(sqlQuery, req.params.studentId,
-    (err, response, fields) => {
-      if (err) {
-        res.status(400).json({
-          message: err,
-        })
-      } else {
-        res.status(201).json({
-          message: 'Student Funding Details',
-          response: response
-        })
-      }
-    })
+router.post('/:studentId/funding', (req, res) => {
+  const newFunding = pick(req.body, 'numberCredits',
+    'raOrTaOrGa',
+    'semesterCode',
+    'stipend',
+    'stipendAmount',
+    'editBy')
+  newFunding.idx = req.params.studentId
+  models.Funding.bulkCreate([
+    {
+      ...newFunding
+    }
+  ]).then(sqlResponse => {
+    res.status(200)
+    res.json(sqlResponse)
+  })
 })
 
-router.post('/:studentId/funding', (req, res, next) => {
-  const newFunding = {
-    idx: req.params.studentId,
-    numberCredits: req.body.numberCredits,
-    raOrTaOrGa: req.body.raOrTaOrGa,
-    semesterCode: req.body.semesterCode,
-    stipend: req.body.stipend,
-    stipendAmount: req.body.stipendAmount,
-    editBy: req.body.editBy
-  }
-  const sqlQuery = 'insert into fundingtable (idx, numberCredits, raOrTaOrGa, semesterCode,' +
-    'stipend, stipendAmount, editBy) values (?)'
-  connection.query(sqlQuery, [[
-      newFunding.idx,
-      newFunding.numberCredits,
-      newFunding.raOrTaOrGa,
-      newFunding.semesterCode,
-      newFunding.stipend,
-      newFunding.stipendAmount,
-      newFunding.editBy
-    ]],
-    (err, response, fields) => {
-      if (err) {
-        res.status(400).json({
-          message: err
-        })
-      } else {
-        res.status(201).json({
-          message: 'Student Funding created',
-          response: response
-        })
-      }
-    })
+router.delete('/:studentId/funding/:fundingId', (req, res) => {
+  models.Funding.destroy({
+    where: {
+      rowIdx: {[Op.eq]: req.params.fundingId}
+    }
+  }).then(sqlResponse => {
+    res.status(200)
+    res.json(sqlResponse)
+  })
 })
 
-router.delete('/:studentId/funding/:rowIdx', (req, res, next) => {
-  const rowIdxToDelete = req.params.rowIdx
-  const sqlQuery = 'delete from fundingtable where rowIdx = ?'
-  connection.query(sqlQuery,
-    [[rowIdxToDelete]],
-    (err, response, fields) => {
-      if (err) {
-        res.status(400).json({
-          message: err
-        })
-      } else {
-        res.status(201).json({
-          message: 'student funding deleted',
-          response: response
-        })
-      }
-    })
+router.patch('/:studentId/funding/:fundingId', (req, res) => {
+  const updatedFunding = pick(req.body, 'numberCredits',
+    'raOrTaOrGa',
+    'semesterCode',
+    'stipend',
+    'stipendAmount',
+    'editBy')
+  updatedFunding.idx = req.params.studentId
+  models.Funding.update({
+    ...updatedFunding
+  }, {
+    where: {
+      rowIdx: {[Op.eq]: req.params.fundingId}
+    }
+  }).then(sqlResponse => {
+    res.status(200)
+    res.json(sqlResponse)
+  })
 })
+
+
 
 module.exports = router
