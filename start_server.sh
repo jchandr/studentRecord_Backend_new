@@ -1,6 +1,5 @@
 # USAGE:  ./start_server {PORT_NUMBER}
 # For example: ./start_server.sh 8000
-# This script will be called to start your server during grading.
 # You do not need to modify this script.
 
 # check if this command was invoked correctly
