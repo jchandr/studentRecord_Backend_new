@@ -1,0 +1,18 @@
+{
+  "development": {
+    "username": "root",
+    "password": "wlan80211",
+    "database": "bu_student_record",
+    "host": "bustudentrecord.cs1znygw5ppc.us-west-2.rds.amazonaws.com",
+    "dialect": "mysql",
+    "operatorsAliases": {
+      "$and": "Op.and",
+      "$or": "Op.or",
+      "$eq": "Op.eq",
+      "$gt": "Op.gt",
+      "$lt": "Op.lt",
+      "$lte": "Op.lte",
+      "$like": "Op.like"
+    }
+  }
+}
